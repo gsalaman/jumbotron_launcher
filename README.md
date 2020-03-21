@@ -14,9 +14,11 @@
 * If joystick disconnects when selecting app, go back to splash screen
 
 ## High Level Design Overview
-The rgbmatrix library will provide our interface with the jumbotron.  We'll use the Python Imagaing Library (PIL) for helper functions.
+We'll use a simple state machine in main().  Main will keep track of "current state", and will call the appropriate function based on which state we're in.  That function will return when a state change is necessaray, returning "next state".  Main can then call that next state.
 
-The launcher will reuse gamepad_wrapper.py (from mqtt_gamepad) in order to interface with the broker and register gamepads.  
+The rgbmatrix library will provide our interface with the jumbotron.  We'll use the Python Imagaing Library (PIL) for helper functions.  In our first cut, the matrix object will be a global, able to be accessed from any state.
+
+The launcher will reuse gamepad_wrapper.py (from mqtt_gamepad) in order to interface with the broker and register gamepads.  This will also be a global, able to be accessed from any state. 
 
 ### States:
 #### Init
