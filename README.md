@@ -16,9 +16,9 @@
 ## High Level Design Overview
 We'll use a simple state machine in main().  Main will keep track of "current state", and will call the appropriate function based on which state we're in.  That function will return when a state change is necessaray, returning "next state".  Main can then call that next state.
 
-The rgbmatrix library will provide our interface with the jumbotron.  We'll use the Python Imagaing Library (PIL) for helper functions.  In our first cut, the matrix object will be a global, able to be accessed from any state.
+The rgbmatrix library will provide our interface with the jumbotron.  We'll use the Python Imagaing Library (PIL) for helper functions.  See the "matrix" section below for design details. 
 
-The launcher will reuse gamepad_wrapper.py (from mqtt_gamepad) in order to interface with the broker and register gamepads.  This will also be a global, able to be accessed from any state. 
+The launcher will reuse gamepad_wrapper.py (from mqtt_gamepad) in order to interface with the broker and register gamepads.  First thought:  this will also be a global, able to be accessed from any state. 
 
 ### States:
 #### Init
@@ -45,3 +45,13 @@ Unselected apps will be Red.
 The current "highlighted" app will be white. 
 
 The loop for this state will confirm that we still have gamepads connected.  We'll use the "get next input" command from the wrapper to move up, down, or launch the app.
+
+### Matrix
+We'll create a "Screen" object to abstract the matrix implementation.  Since we only need to display text, we'll break the "screen" into rows, and provide APIs to set text and color for each row.  The object will abstract the PIL concepts; it will internally have a PIL "Image" and "Draw" object.  We'll only use one default font, and that will not be user settable.
+
+The init function for this object will calculate the number of text rows available and initialize the matrix.  
+
+We'll provide a method for "set row"...this will take a string, color, and row number parameter.  It will blank the existing row, and set the new text to the provided string and color.
+
+We'll also have an "erase row" and "erase all" method.
+
