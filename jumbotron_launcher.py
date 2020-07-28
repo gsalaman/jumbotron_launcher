@@ -92,9 +92,9 @@ def waitForGamepad_state():
 
   centered_text("waiting for joystick to connect", box_color, text_color, splash_font, 0)   
 
-  if (wrapper.player_cound() == 0)
-    return "waitForGamepaad"
-  else
+  if (wrapper.player_count() == 0):
+    return "waitForGamepad"
+  else:
     return "processInput"
 
 ###########################################################
@@ -102,7 +102,12 @@ def waitForGamepad_state():
 ###########################################################
 def processInput_state():
   
-  return "waitForGamepad"
+  box_color = (255, 0, 0)  # Red
+  text_color = (0, 0, 255) # Blue 
+  splash_font = ImageFont.truetype('Pillow/Tests/font/Courier_New_Bold.ttf', 10)
+
+  centered_text("connected!!!", box_color, text_color, splash_font, 0)   
+  return "processInput"
 
 ###########################################################
 # MAIN 
@@ -111,16 +116,17 @@ def main():
   current_state = "init"
   
   
+  while (True):
 
-  if (current_state == "init"):
-    init_state()
-  elif (current_state == "waitForGamepad"):
-    waitForGamepad_state()
-  elif (current_state == "processInput"):
-    processInput_state()
-  else:  
-    print("Unknown state: ", current_state)
-    exit(1)
+    if (current_state == "init"):
+      current_state = init_state()
+    elif (current_state == "waitForGamepad"):
+      current_state = waitForGamepad_state()
+    elif (current_state == "processInput"):
+      current_state = processInput_state()
+    else:  
+      print("Unknown state: ", current_state)
+      exit(1)
 
 if __name__ == "__main__":
   main()
