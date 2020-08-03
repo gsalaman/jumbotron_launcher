@@ -1,3 +1,5 @@
+import os
+import subprocess
 import time
 from gamepad_wrapper import Gamepad_wrapper
 
@@ -101,12 +103,20 @@ def waitForGamepad_state():
 # PROCESSINPUT STATE
 ###########################################################
 def processInput_state():
+  global wrapper
   
   box_color = (255, 0, 0)  # Red
   text_color = (0, 0, 255) # Blue 
   splash_font = ImageFont.truetype('Pillow/Tests/font/Courier_New_Bold.ttf', 10)
 
-  centered_text("connected!!!", box_color, text_color, splash_font, 0)   
+  centered_text("connected", box_color, text_color, splash_font, 0)   
+
+  input = wrapper.get_next_input()
+  if (input != None):
+    print("Got "+input[0]+" "+input[1])
+    proc = subprocess.Popen(['sudo','python', '../matrix_test/matrix_test.py'])
+    exit(1)
+
   return "processInput"
 
 ###########################################################
