@@ -55,3 +55,10 @@ We'll provide a method for "set row"...this will take a string, color, and row n
 
 We'll also have an "erase row" and "erase all" method.
 
+
+# Sudo notes:
+Since I'm spawning sudo processes, I need to give the "daemon" user permission to run sudo without a password. (yes, this is unsecure!!!)  To do so:
+* edit the "sudoers" file by typing "sudo visudo"
+* append a line that says:  "daemon ALL=(ALL) NOPASSWD:ALL
+
+No reboot required.  :)
