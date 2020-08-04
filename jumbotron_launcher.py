@@ -58,10 +58,6 @@ def centered_text(my_text, box_color, text_color, font, delay):
     text_image = Image.new("RGB", (box_size_x, box_size_y))
     text_draw = ImageDraw.Draw(text_image)
     
-    #clear the screen
-    text_draw.rectangle((0, 0, total_columns, total_rows),
-                         fill = (0,0,0))
-    matrix.SetImage(text_image,0,0) 
 
     box = (0,0,box_size_x-1,box_size_y-1)
     text_draw.rectangle(box, outline=box_color)
@@ -216,6 +212,12 @@ def processInput_state():
 
     time.sleep(0.001)
 
+  #clear the screen
+  blank_image = Image.new("RGB", (total_columns, total_rows))
+  blank_draw = ImageDraw.Draw(blank_image)
+  blank_draw.rectangle((0, 0, total_columns, total_rows),
+                         fill = (0,0,0))
+  matrix.SetImage(blank_image,0,0) 
   return "waitForGamepad"
 
 ###########################################################
