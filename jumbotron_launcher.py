@@ -34,6 +34,7 @@ options.gpio_slowdown = 2
 
 # I'm gonna treat the matrix and wrapper as globals.
 matrix = RGBMatrix(options = options)
+
 wrapper = Gamepad_wrapper(4) 
 
 ###################################
@@ -43,6 +44,7 @@ def centered_text(my_text, box_color, text_color, font, delay):
     global total_columns
     global total_rows
     global matrix
+
 
     # getsize returns a tuple of the x and y size of the font string.
     text_size = font.getsize(my_text)
@@ -55,6 +57,12 @@ def centered_text(my_text, box_color, text_color, font, delay):
 
     text_image = Image.new("RGB", (box_size_x, box_size_y))
     text_draw = ImageDraw.Draw(text_image)
+    
+    #clear the screen
+    text_draw.rectangle((0, 0, total_columns, total_rows),
+                         fill = (0,0,0))
+    matrix.SetImage(text_image,0,0) 
+
     box = (0,0,box_size_x-1,box_size_y-1)
     text_draw.rectangle(box, outline=box_color)
 
@@ -67,6 +75,93 @@ def centered_text(my_text, box_color, text_color, font, delay):
 
     matrix.SetImage(text_image,box_x,box_y)
     time.sleep(delay)
+
+###########################################################
+# APP SELECTOR
+###########################################################
+class AppSelector():
+  def __init__(self):
+    self.select_index = 0
+    
+    self.app_names = ["cycles", "wormgame", "tank"]
+    self.app_commands = ["cycles.sh", "wormgame.sh", "tank.sh"]
+
+    self.row_height = 14
+    self.highlight_color = (0,255,0)
+    self.back_color = (255,0,0) 
+ 
+    self.image = Image.new("RGB", (total_columns, total_rows))
+    self.draw = ImageDraw.Draw(self.image)
+
+    #clear the screen
+    self.draw.rectangle((0, 0, total_columns, total_rows),
+                         fill = (0,0,0))
+    matrix.SetImage(self.image,0,0) 
+
+    tmp_index = 0
+    for name in self.app_names:
+      self.showRow(tmp_index)
+      tmp_index = tmp_index + 1
+    self.num_apps = tmp_index
+    print(tmp_index)
+      
+  def processUp(self):
+    if (self.select_index == 0):
+      self.select_index = self.num_apps - 1
+      self.showRow(0)
+      self.showRow(self.select_index)
+    else:
+      self.select_index = self.select_index - 1
+      self.showRow(self.select_index)
+      self.showRow(self.select_index + 1)
+
+  def processDown(self):
+    if (self.select_index == self.num_apps - 1):
+      self.select_index = 0 
+      self.showRow(self.num_apps - 1)
+      self.showRow(self.select_index)
+    else:
+      self.select_index = self.select_index + 1
+      self.showRow(self.select_index)
+      self.showRow(self.select_index - 1)
+
+  def processSelect(self):
+    proc = subprocess.Popen(['sh', self.app_commands[self.select_index]])
+    exit(1)
+
+  def showRow(self, row):
+
+    if (row == self.select_index):
+      tmp_color = self.highlight_color
+    else:
+      tmp_color = self.back_color
+ 
+
+    app_font = ImageFont.truetype('Pillow/Tests/font/Courier_New_Bold.ttf', 10)
+
+    self.eraseRow(row)
+    self.draw.text((0,row*self.row_height),
+                   self.app_names[row],
+                   fill = tmp_color,
+                   font = app_font)
+    matrix.SetImage(self.image, 0, 0)
+
+  def eraseRow(self, row):
+    self.draw.rectangle((0, row*self.row_height, 
+                         total_columns, self.row_height*(row+1)),
+                         fill = (0,0,0))
+    matrix.SetImage(self.image,0,0) 
+
+  def stopSelector(self):
+    pass
+
+  def processInput(self, input):
+    if (input == "up"):
+      self.processUp()
+    elif (input == "down"):
+      self.processDown()
+    elif (input == "right"):
+      self.processSelect()
 
 ###########################################################
 # INIT STATE
@@ -111,20 +206,23 @@ def processInput_state():
 
   centered_text("connected", box_color, text_color, splash_font, 0)   
 
-  input = wrapper.get_next_input()
-  if (input != None):
-    print("Got "+input[0]+" "+input[1])
-    proc = subprocess.Popen(['sudo','python', '../matrix_test/matrix_test.py'])
-    exit(1)
+  appSel = AppSelector()
 
-  return "processInput"
+  while (wrapper.player_count() > 0):
+    input = wrapper.get_next_input()
+    if (input != None):
+      print("Got "+input[0]+" "+input[1])
+      appSel.processInput(input[1])
+
+    time.sleep(0.001)
+
+  return "waitForGamepad"
 
 ###########################################################
 # MAIN 
 ###########################################################
 def main():
   current_state = "init"
-  
   
   while (True):
 
