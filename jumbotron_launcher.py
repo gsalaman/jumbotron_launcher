@@ -1,7 +1,7 @@
 import os
 import subprocess
 import time
-from gamepad_wrapper import Gamepad_wrapper
+from gamepad_wrapper import Gamepad_wrapper,send_game_exit
 
 ##########################################################
 # RGB matrix inits
@@ -79,8 +79,8 @@ class AppSelector():
   def __init__(self):
     self.select_index = 0
     
-    self.app_names = ["cycles", "wormgame", "tank"]
-    self.app_commands = ["cycles.sh", "wormgame.sh", "tank.sh"]
+    self.app_names = ["fish tank", "cycles", "wormgame", "donuts", "exit"]
+    self.app_commands = ["tank.sh", "cycles.sh", "wormgame.sh", "donuts.sh","just_exit.sh"]
 
     self.row_height = 14
     self.highlight_color = (0,255,0)
@@ -123,6 +123,8 @@ class AppSelector():
 
   def processSelect(self):
     proc = subprocess.Popen(['sh', self.app_commands[self.select_index]])
+    send_game_exit()
+    time.sleep(.01)
     exit(1)
 
   def showRow(self, row):
@@ -183,7 +185,7 @@ def waitForGamepad_state():
   text_color = (0, 0, 255) # Blue 
   splash_font = ImageFont.truetype('Pillow/Tests/font/Courier_New_Bold.ttf', 10)
 
-  centered_text("waiting for joystick to connect", box_color, text_color, splash_font, 0)   
+  centered_text("turn on joystick", box_color, text_color, splash_font, 0)   
 
   if (wrapper.player_count() == 0):
     return "waitForGamepad"
