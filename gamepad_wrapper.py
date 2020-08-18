@@ -16,6 +16,10 @@ _player_list = []
 
 _client = mqtt.Client("Gamepad_Wrapper")
 
+def send_game_exit():
+  global _client
+  _client.publish("game_state", "exit")
+
 def default_shutdown_cb():
   #default shutdown does nothing
   print("default shutdown callback:  does nothing");
